@@ -1,0 +1,168 @@
+scalar Time
+scalar Upload
+
+"""
+  Content Types
+"""
+type AheadBehind {
+  ahead: Int!
+  behind: Int!
+}
+
+"""
+  Project Types
+"""
+type Project {
+  id: ID!
+  name: ProjectName!
+  description: String!
+  defaultBranch: ProjectReference!
+  branchCount: Int!
+  commitCount: Int!
+  tagCount: Int!
+  issueCount: Int!
+  images: ProjectImages!
+  language: String!
+  lastUpdated: Time!
+  technologies: [ String! ]!
+  url: String!
+}
+
+type ProjectReference {
+  id: ID!
+  hash: String!
+	project: String!
+	name: String
+	type: String!
+	date: Time!
+	default: Boolean
+	aheadbehind: AheadBehind
+	message: [ String ]
+}
+
+type ProjectIssue {
+  id: ID!
+	project: String!
+  number: Int!
+	title: String!
+	status: Boolean!
+  date: Time!
+	labels: [ String ]!
+	richText: String!
+}
+
+type ProjectImages {
+  background: String!
+  logo: String!
+}
+
+type ProjectName {
+  display: String!
+  original: String!
+}
+
+"""
+  Queries
+"""
+type Query {
+  projects( page: Int! filter: ProjectsFilterInput ): [ Project ]!
+  issues( page: Int! filter: IssuesFilterInput ): [ ProjectIssue ]!
+  branches( page: Int! project: String! ): [ ProjectReference ]!
+  commits( page: Int! project: String! ): [ ProjectReference ]!
+  tags( page: Int! project: String! ): [ ProjectReference ]!
+  release( project: String!, reference: String! ): ProjectReference!
+}
+
+"""
+  Query Inputs
+"""
+input ProjectsFilterInput {
+  keyword: String
+  language: String
+}
+
+input IssuesFilterInput {
+  project: String
+  status: Boolean
+  number: Int
+}
+
+"""
+  Mutations
+"""
+type Mutation {
+  createIssue( input:NewIssue! ): String!
+  createProject( input:NewProject! ): String!
+  createRelease( input:NewRelease! ): String!
+
+  deleteIssue( input:ID! ): Boolean!
+  deleteProject( input:ID! ): Boolean!
+  deleteRelease( input:ID! ): Boolean!
+
+  updateIssue( input:UpdateIssue ): Boolean!
+  updateProject( input:UpdateProject ): Boolean!
+  updateRelease( input:UpdateRelease ): Boolean!
+}
+
+"""
+  Mutation Inputs
+"""
+input NameInput {
+  display: String!
+  original: String!
+}
+
+input ImagesInput {
+  background: Upload!
+  logo: Upload!
+}
+
+input NewIssue {
+	labels: [ String ]!
+	project: ID!
+	richText: String!
+	status: Boolean!
+	title: String!
+}
+
+input NewProject {
+  description: String!
+  images: ImagesInput!
+  language: String!
+  name: NameInput!
+  technologies: [ String! ]!
+  url: String!
+}
+
+input NewRelease {
+  project: ID!
+  richText: String!
+  tag: String!
+}
+
+input UpdateIssue {
+  id: ID!
+	labels: [ String ]
+  number: Int
+	project: String
+	richText: String
+	status: Boolean
+	title: String
+}
+
+input UpdateProject {
+  id: ID!
+  description: String
+  images: ImagesInput
+  language: String
+  name: NameInput
+  technologies: [ String ]
+  url: String
+}
+
+input UpdateRelease {
+  id: ID!
+  project: ID
+  richText: String
+  tag: String
+}
